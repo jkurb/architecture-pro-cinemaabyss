@@ -1,0 +1,27 @@
+@startuml
+title Кинобездна TO-BE Context 
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь стримингового сервиса")
+Person(support, "Поддержка", "Команда по обслуживанию клиентов")
+Person(sales, "Продажи", "Команда по продажам и маркетингу")
+
+System(CinemaAbyss, "Кинобездна", "Онлайн-кинотеатр - агрегатор")
+
+System_Ext(payments, "Платёжная система", "Внешний платёжный шлюз")
+System_Ext(contentProviders, "Поставщики контента", "Внешние кинотеатры, поставщики контента")
+System_Ext(cdn, "CDN сервис", "Внешний CDN сервис")
+System_Ext(reccomendations, "Реккомендации", "Внешний сервис рекомендаций")
+
+Rel(user, CinemaAbyss, "Покупка подписки, просмотр контента")
+Rel(support, CinemaAbyss, "Поддержка пользователей")
+Rel(sales, CinemaAbyss, "Наполнение витрины, управление контентом")
+Rel(CinemaAbyss, payments, "Оплата подписки")
+Rel(CinemaAbyss, contentProviders, "Получение метданных контента и master файлов")
+Rel(CinemaAbyss, cdn, "Загрузка файлов для воспроизведения")
+Rel(CinemaAbyss, reccomendations, "Получение рекомендаций")
+
+@enduml
