@@ -1,0 +1,61 @@
+name: API Tests
+
+on:
+    push:
+        branches: [ main, master, cinema ]
+    pull_request:
+        branches: [ main, master, cinema ]
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment to run tests against"
+                required: true
+                default: "local"
+                type: choice
+                options:
+                    - local
+                    - docker
+                    - kubernetes
+            test_folder:
+                description: "Test folder to run (leave empty for all)"
+                required: false
+                type: string
+
+jobs:
+    api-tests:
+        name: Run API Tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Start services with Docker Compose
+              run: docker compose up -d --build
+
+            - name: Wait for services to be ready
+              run: sleep 30
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: "18"
+                cache: "npm"
+                cache-dependency-path: tests/postman/package-lock.json
+
+            - name: Install Newman and dependencies
+              working-directory: tests/postman
+              run: npm ci
+
+            - name: Run API tests
+              working-directory: tests/postman
+              run: |
+                if [ -n "${{ inputs.test_folder }}" ]; then
+                    node run-tests.js --environment "${{ inputs.environment }}" --folder "${{ inputs.test_folder }}"
+                else
+                    node run-tests.js --environment "${{ inputs.environment }}"
+                fi
+
+            - name: Stop services
+              if: always()
+              run: docker compose down -v
