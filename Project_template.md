@@ -115,6 +115,19 @@ API компании построено в соответствии с REST-ст
    ```
 - Протестируйте постепенный переход, изменив переменную окружения MOVIES_MIGRATION_PERCENT в файле docker-compose.yml.
 
+Протестировать можно с помощью заголовка **X-Upstream-Service: movies-service|monolith**
+
+```bash
+curl -s -D - -o /dev/null "http://localhost:8000/api/movies"
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Sun, 15 Mar 2026 21:15:27 GMT
+X-Upstream-Service: movies-service
+Transfer-Encoding: chunked
+```
+
+
 ### 2. Kafka
  Вам как архитектуру нужно также проверить гипотезу насколько просто реализовать применение Kafka в данной архитектуре.
 
@@ -124,8 +137,13 @@ API компании построено в соответствии с REST-ст
     - Реализуйте простой API, при вызове которого будут создаваться события User/Payment/Movie и обрабатываться внутри сервиса с записью в лог
     - Добавьте в docker-compose новый сервис, kafka там уже есть
 
-Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman 
+Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman
+
 Приложите скриншот тестов и скриншот состояния топиков Kafka http://localhost:8090 
+
+![Тесты](schemas/tests.png)
+![Топики](schemas/kafka-ui.png)
+
 
 
 ## Задание 3
