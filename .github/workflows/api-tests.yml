@@ -50,10 +50,17 @@ jobs:
             - name: Run API tests
               working-directory: tests/postman
               run: |
-                if [ -n "${{ inputs.test_folder }}" ]; then
-                    node run-tests.js --environment "${{ inputs.environment }}" --folder "${{ inputs.test_folder }}"
+                TEST_ENV="${{ github.event.inputs.environment }}"
+                TEST_FOLDER="${{ github.event.inputs.test_folder }}"
+
+                if [ -z "$TEST_ENV" ]; then
+                    TEST_ENV="local"
+                fi
+
+                if [ -n "$TEST_FOLDER" ]; then
+                    node run-tests.js --environment "$TEST_ENV" --folder "$TEST_FOLDER"
                 else
-                    node run-tests.js --environment "${{ inputs.environment }}"
+                    node run-tests.js --environment "$TEST_ENV"
                 fi
 
             - name: Stop services
