@@ -21,8 +21,8 @@ spec:
         app: movies-service
     spec:
       containers:
-      - name: movies-service
-        image: ghcr.io/db-exp/cinemaabysstest/movies-service:latest
+      - name: movies-service        
+        image: ghcr.io/jkurb/architecture-pro-cinemaabyss/movies-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081

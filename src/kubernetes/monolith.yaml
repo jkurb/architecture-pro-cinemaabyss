@@ -21,8 +21,8 @@ spec:
         app: monolith
     spec:
       containers:
-      - name: monolith
-        image:  ghcr.io/db-exp/cinemaabysstest/monolith:latest
+      - name: monolith        
+        image: ghcr.io/jkurb/architecture-pro-cinemaabyss/monolith:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
