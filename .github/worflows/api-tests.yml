@@ -2,9 +2,9 @@ name: API Tests
 
 on:
   push:
-    branches: [ main, master, cinema ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, master, cinema ]
+    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       environment:
