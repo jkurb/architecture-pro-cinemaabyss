@@ -1,0 +1,115 @@
+@startuml
+title Кинобездна TO-BE Container
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь", "Пользователь стримингового сервиса")
+Person(support, "Поддержка", "Команда по обслуживанию клиентов")
+Person(sales, "Продажи", "Команда по продажам и маркетингу")
+
+System_Ext(payments, "Платёжная система", "Внешний платёжный шлюз")
+System_Ext(contentProviders, "Поставщики контента", "Внешние кинотеатры и поставщики контента")
+System_Ext(cdn, "CDN сервис", "Внешний CDN для раздачи видео")
+System_Ext(recommendations, "Рекомендации", "Внешний сервис рекомендаций")
+
+System_Boundary(CinemaAbyss, "Кинобездна") {
+
+    Container(WebApp, "Web App", "React, TypeScript", "Веб-приложение для пользователей")
+    Container(MobileApp, "Mobile App", "Kotlin, Swift", "Мобильное приложение")
+    Container(SmartTV, "Smart TV App", "Kotlin, TypeScript", "Приложение для Smart TV")
+    Container(BackOffice, "Back Office", "React, TypeScript", "Админ-панель: управление контентом и витриной")
+
+    Container(BFFWebApp, "BFF Web", "Golang", "Backend-for-Frontend для Web")
+    Container(BFFMobileApp, "BFF Mobile", "Golang", "Backend-for-Frontend для Mobile")
+    Container(BFFSmartTV, "BFF Smart TV", "Golang", "Backend-for-Frontend для Smart TV")
+
+    Container(Movie, "Content Catalog", "Golang", "Метаданные фильмов, рейтинги, жанры, поиск")
+    ContainerDb(MovieStore, "Movie Store", "MongoDB", "Хранение метаданных фильмов")
+
+    Container(Personalization, "Personalization", "Golang", "История просмотров, избранное, интеграция с рекомендациями")
+    ContainerDb(PersonalizationStore, "Personalization Store", "MongoDB", "История, избранное, предпочтения")
+
+    Container(MetadataImport, "Metadata Import", "Golang", "Выгрузка метаданных из внешних каталогов")
+
+    Container(UserProfile, "User Profile", "Golang", "Данные профиля, настройки аккаунта")
+    ContainerDb(UserProfileStore, "User Store", "PostgreSQL", "Данные пользователей")
+
+    Container(Subscription, "Subscription & Billing", "Golang", "Тарифы, подписки, платежи, скидки")
+    ContainerDb(SubscriptionStore, "Subscription Store", "PostgreSQL", "Подписки, платежи, тарифы")
+
+    Container(Auth, "Auth", "Keycloak", "Аутентификация, авторизация, роли, сессии")
+    ContainerDb(AuthStore, "Auth Store", "PostgreSQL", "Пользователи, роли, токены")
+
+    Container(Transcoding, "Transcoding", "Golang", "Конвертация видео в разные форматы и битрейты (HLS/DASH)")
+    ContainerDb(TranscodingStore, "Transcoding Store", "S3/MinIO", "Исходные и сконвертированные видеофайлы")
+
+    Container(CDNPublisher, "CDN Publisher", "Golang", "Загрузка готовых файлов на CDN, управление кэшированием")
+
+    Container(Playback, "Playback", "Golang", "Воспроизведение видео, DRM-лицензирование, управление сессиями просмотра")
+
+    Container(Events, "Events Service", "Golang", "Обработка доменных событий")
+    ContainerQueue(MessageQueue, "Message Broker", "Kafka", "Шина событий между сервисами")
+}
+
+Rel(user, WebApp, "Просмотр контента, управление подпиской", "UI/Web")
+Rel(user, MobileApp, "Просмотр контента, управление подпиской", "UI/Mobile")
+Rel(user, SmartTV, "Просмотр контента", "UI/Web")
+Rel(support, BackOffice, "Поддержка пользователей, просмотр логов", "UI/Web")
+Rel(sales, BackOffice, "Наполнение каталога, управление витриной", "UI/Web")
+
+Rel(WebApp, BFFWebApp, "API-запросы", "Web API/REST")
+Rel(MobileApp, BFFMobileApp, "API-запросы", "Web API/REST")
+Rel(SmartTV, BFFSmartTV, "API-запросы", "Web API/REST")
+
+Rel(BFFWebApp, Auth, "Проверка токена, логин, регистрация", "Web API/REST")
+Rel(BFFWebApp, Movie, "Каталог фильмов, поиск, рейтинги", "Web API/REST")
+Rel(BFFWebApp, UserProfile, "Профиль пользователя, настройки", "Web API/REST")
+Rel(BFFWebApp, Subscription, "Управление подписками, платежи", "Web API/REST")
+Rel(BFFWebApp, Personalization, "Избранное, история, рекомендации", "Web API/REST")
+Rel(BFFWebApp, Playback, "Запрос потока воспроизведения, DRM", "Web API/REST")
+
+Rel(BFFMobileApp, Auth, "Проверка токена, логин, регистрация", "Web API/REST")
+Rel(BFFMobileApp, Movie, "Каталог фильмов, поиск, рейтинги", "Web API/REST")
+Rel(BFFMobileApp, UserProfile, "Профиль пользователя, настройки", "Web API/REST")
+Rel(BFFMobileApp, Subscription, "Управление подписками, платежи", "Web API/REST")
+Rel(BFFMobileApp, Personalization, "Избранное, история, рекомендации", "Web API/REST")
+Rel(BFFMobileApp, Playback, "Запрос потока воспроизведения, DRM", "Web API/REST")
+
+Rel(BFFSmartTV, Auth, "Проверка токена, логин", "Web API/REST")
+Rel(BFFSmartTV, Movie, "Каталог фильмов, поиск", "Web API/REST")
+Rel(BFFSmartTV, UserProfile, "Профиль пользователя, настройки", "Web API/REST")
+Rel(BFFSmartTV, Subscription, "Управление подписками, платежи", "Web API/REST")
+Rel(BFFSmartTV, Personalization, "Избранное, история, рекомендации", "Web API/REST")
+Rel(BFFSmartTV, Playback, "Запрос потока воспроизведения", "Web API/REST")
+
+Rel(BackOffice, Auth, "Аутентификация администратора", "Web API/REST")
+Rel(BackOffice, Movie, "Управление каталогом контента", "Web API/REST")
+Rel(BackOffice, MetadataImport, "Запуск импорта метаданных", "Web API/REST")
+Rel(BackOffice, Subscription, "Управление тарифами и скидками", "Web API/REST")
+
+Rel(Movie, MovieStore, "CRUD метаданных фильмов", "DB")
+Rel(Personalization, PersonalizationStore, "История, избранное", "DB/SQL")
+Rel(UserProfile, UserProfileStore, "Данные пользователей", "DB/SQL")
+Rel(Subscription, SubscriptionStore, "Подписки, платежи, тарифы", "DB/SQL")
+Rel(Auth, AuthStore, "Пользователи, роли, сессии", "DB/SQL")
+Rel(Transcoding, TranscodingStore, "Чтение/запись видеофайлов", "File/S3")
+
+Rel(MetadataImport, Movie, "Загрузка и обновление метаданных", "Web API/REST")
+Rel(Personalization, recommendations, "Запрос персональных рекомендаций", "Web API/REST")
+Rel(Subscription, payments, "Проведение платежей", "Web API/REST")
+Rel(MetadataImport, contentProviders, "Получение метаданных и master-файлов", "Web API/REST")
+Rel(CDNPublisher, cdn, "Загрузка файлов на CDN", "File/S3")
+Rel(Playback, cdn, "Получение URL потока", "Web API/REST")
+Rel(Transcoding, CDNPublisher, "Передача сконвертированных файлов", "File/S3")
+
+Rel(Events, MessageQueue, "Публикация и потребление событий", "Messaging/Kafka")
+Rel(Movie, MessageQueue, "События каталога (обновление, добавление)", "Messaging/Kafka")
+Rel(Subscription, MessageQueue, "События подписок и платежей", "Messaging/Kafka")
+Rel(UserProfile, MessageQueue, "События пользователей (регистрация)", "Messaging/Kafka")
+Rel(Personalization, MessageQueue, "Потребление событий просмотров", "Messaging/Kafka")
+Rel(Transcoding, MessageQueue, "Задачи на транскодирование, статусы", "Messaging/Kafka")
+Rel(Playback, MessageQueue, "События просмотров", "Messaging/Kafka")
+
+@enduml
