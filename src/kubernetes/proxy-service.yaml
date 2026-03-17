@@ -43,13 +43,13 @@ spec:
                           memory: "128Mi"
                   readinessProbe:
                       httpGet:
-                          path: /
+                          path: /health
                           port: 8000
                       initialDelaySeconds: 5
                       periodSeconds: 10
                   livenessProbe:
                       httpGet:
-                          path: /
+                          path: /health
                           port: 8000
                       initialDelaySeconds: 15
                       periodSeconds: 20

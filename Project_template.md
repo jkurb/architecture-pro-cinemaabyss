@@ -323,6 +323,9 @@ cat .docker/config.json | base64
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
 
 
+![Тесты](schemas/kube-test-movies.png)
+![Тесты](schemas/kube-test-events.png)
+
 ## Задание 4
 Для простоты дальнейшего обновления и развертывания вам как архитектуру необходимо так же реализовать helm-чарты для прокси-сервиса и проверить работу 
 
